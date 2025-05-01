@@ -1,0 +1,39 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# Frontend Architecture
+
+The TestDrivenLearning frontend is built with Next.js 14 using the App Router architecture. It follows a structured component organization and user flow.
+
+## Page Structure
+
+The application is organized into the following key pages:
+
+- **Landing Page**: Chat interface for goal-setting and journey creation
+- **Authentication**: Google OAuth sign-in flow
+- **Dashboard**: Central hub for learning journey
+- **Courses/Lessons**: Content delivery with embedded videos
+- **Profile/Settings**: User profile and preference management
+- **Payment**: Subscription plans and checkout flow
+
+## Component Organization
+
+Components are organized by functionality:
+
+- `layout/` - Page layouts and navigation components
+- `ui/` - Reusable UI components
+- `auth/` - Authentication components
+- `courses/` - Course-related components
+- `payment/` - Payment-related components
+- `chat/` - AI chat interface components
+
+## User Flow
+
+1. User lands on homepage with chat interface
+2. After setting goals, user authenticates with Google
+3. User subscribes to access personalized content
+4. Dashboard displays learning journey with assessment interface
+5. User takes tests and receives video recommendations
+6. Progress is tracked across learning sessions

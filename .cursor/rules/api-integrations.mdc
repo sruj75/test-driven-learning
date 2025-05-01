@@ -1,0 +1,45 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# API Integrations
+
+The TestDrivenLearning platform integrates with several external APIs to provide its core functionality.
+
+## Authentication (Google OAuth via Supabase)
+
+- Uses Supabase Auth with Google OAuth provider
+- Configuration requires Google Cloud Console setup
+- User profile data is retrieved from Google account
+- JWT tokens manage authentication state
+
+## Groq Cloud API (AI Features)
+
+- Uses OpenAI library with Groq Cloud API endpoint
+- Key features:
+  - Conversational goal setting
+  - Dynamic test generation
+  - Knowledge gap identification
+  - Resource recommendation algorithms
+  - Personalized concept explanations
+- Responses are cached to optimize costs
+
+## YouTube API
+
+- Used to retrieve educational video resources
+- Features:
+  - Video search based on knowledge gaps
+  - Metadata retrieval for relevance scoring
+  - Embedded video player integration
+  - Progress tracking (watched/unwatched)
+  - Alternative video recommendation
+
+## Stripe (Payment Processing)
+
+- Handles subscription management
+- Implementation:
+  - Checkout session creation
+  - Webhook handlers for payment events
+  - Subscription status tracking
+  - Payment failure handling

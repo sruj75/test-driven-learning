@@ -27,14 +27,21 @@
    - Identifies knowledge gaps from test results
    - Visualizes strengths and weaknesses
 
-4. **Personalized Learning Recommendations**
+4. **Personalized Learning Resources**
    - Recommends specific YouTube videos based on identified gaps
-   - Provides concise LLM-generated summaries of concepts when needed
+   - Provides concise AI-generated explanations of concepts when needed
+   - Alternative resource recommendations when feedback indicates resource wasn't helpful
 
-5. **Continuous Testing Loop**
-   - Retesting with dynamically generated new questions
+5. **Test-Resource Learning Cycle**
+   - Test → Resource → Test loop that drives the learning process
    - Focus on weak areas while maintaining coverage of all required concepts
    - Prevent memorization through question variation
+   - Resource helpfulness feedback to improve recommendations
+
+6. **Streamlined Authentication**
+   - One-click Google sign-in for frictionless onboarding
+   - Profile creation using Google account information
+   - Secure authentication flow
 
 ### Nice-to-Have Features:
 - Progress dashboard with visualizations
@@ -47,36 +54,40 @@
 ### User Journeys:
 1. **New User Journey**:
    - User sets a learning goal ("I want to learn JavaScript")
+   - Signs in with Google account
    - Takes initial assessment test
-   - Receives personalized learning plan with video recommendations
-   - Studies recommended content
-   - Retests to measure improvement
+   - Receives personalized learning resources (YouTube videos, explanations)
+   - Studies resources and marks them as helpful/not helpful
+   - Takes follow-up test targeting identified gaps
    - Cycle continues until mastery
 
 2. **Return User Journey**:
-   - Views progress dashboard
-   - Continues from previous session
+   - Automatic authentication with Google account
+   - Views dashboard with domains and progress
+   - Continues from previous position in test-resource cycle
    - System recalls weak areas and focuses testing there
-   - New recommendations based on latest performance
+   - New resources based on latest performance
 
 ## 3. Design & Technical Considerations
 - **UI/UX Direction**:
   - Clean, distraction-free testing environment
   - Intuitive progress visualization
-  - Seamless transition between testing and learning
+  - Seamless transition between tests and resources
   - Mobile-responsive design for learning on the go
 
 - **Technical Stack**: 
-  - Frontend: Next.js with TailwindCSS
+  - Frontend: Next.js with TypeScript/TSX and TailwindCSS
   - Backend: Next.js API routes
-  - AI/LLM: Groq Cloud API for fast inference
-  - External APIs: YouTube Data API
+  - AI/LLM: Groq Cloud API (using OpenAI library compatibility)
+  - External APIs: YouTube Data API, Google OAuth
   - Database: Supabase/PostgreSQL for user data and progress
+  - Authentication: Supabase Auth with Google OAuth integration
 
 - **Integration Requirements**:
-  - YouTube API for video recommendations
-  - LLM API for test generation and concept explanations
-  - Authentication system
+  - YouTube API for resource recommendations
+  - Groq Cloud API for test generation and concept explanations
+  - Google OAuth for authentication
+  - Stripe for subscription management
   - Analytics for user progress tracking
 
 ## 4. Success Metrics
@@ -85,13 +96,17 @@
   - Knowledge improvement (test score improvements over time)
   - Time-to-mastery compared to traditional learning methods
   - User satisfaction scores
-  - Completion rates of learning paths
+  - Completion rates of learning domains
+  - Authentication conversion rate (% of users who complete Google sign-in)
+  - Resource helpfulness rate (% of resources marked as helpful)
 
 - **Evaluation Criteria**:
   - Quality and relevance of generated tests
   - Accuracy of gap identification
   - Relevance of recommended learning resources
-  - User engagement with the testing/learning loop
+  - User engagement with the test-resource cycle
+  - Authentication flow smoothness
+  - Resource relevance and quality
 
 ## 5. Monetization Strategy
 - **Initial Subscription Model (MVP)**:
@@ -105,7 +120,7 @@
   - Student discount plans for semester/annual subscriptions
 
 - **Ad Integration (Post-MVP)**:
-  - Non-intrusive ad placements between tests and learning recommendations
+  - Non-intrusive ad placements between tests and resources
   - Targeted educational ads (courses, books, tools)
   - Option to remove ads with subscription
 
@@ -122,15 +137,17 @@
 ## 6. Timeline & Milestones
 - **Phase 1 (MVP)**:
   - Basic goal selection from predefined list
-  - Initial test generation for limited subjects
-  - YouTube video recommendations for wrong answers
-  - Simple retesting functionality
-  - Basic subscription model with early adopter pricing
+  - Google OAuth integration
+  - Initial test generation for limited domains
+  - YouTube video recommendations based on test results
+  - Resource feedback collection
+  - Basic test-resource cycle implementation
+  - Simple subscription model with early adopter pricing
   - Simple payment processing integration
   
 - **Phase 2**:
   - Dynamic test generation with varied questions
-  - Improved recommendation algorithm
+  - Improved resource recommendation algorithm
   - User dashboard with progress tracking
   - Custom goal setting
   - Introduction of ad-supported free tier
@@ -144,15 +161,50 @@
   - Advanced ad placement optimization
   - Content partnerships and affiliate program
 
-## 7. Open Questions & Decisions
-- How to effectively evaluate the quality of recommended videos?
-- How to balance repetition of concepts with preventing memorization?
+## 7. Post-MVP Feature Expansion
+
+### Multi-Domain Learning Support
+- **Description**: Enable users to manage multiple learning domains (subjects) within a single account
+- **Features**:
+  - Domain switching interface
+  - Separate goals and progress tracking per domain
+  - Domain-specific test-resource cycles
+  - Cross-domain learning recommendations
+  
+- **Implementation Considerations**:
+  - Extended database schema for multiple domains
+  - UI for managing multiple domains
+  - Enhanced progress tracking across domains
+  - Domain-specific test and resource recommendation algorithms
+
+### Enhanced Social Learning
+- **Description**: Add collaborative and social elements to enhance learning motivation
+- **Features**:
+  - Study groups with shared goals
+  - Learning competitions and challenges
+  - Peer progress comparisons
+  - Knowledge sharing between users
+
+### Advanced Analytics
+- **Description**: Provide deeper insights into learning patterns and effectiveness
+- **Features**:
+  - Learning style identification
+  - Time-based effectiveness metrics
+  - Predictive learning path optimization
+  - Detailed strength/weakness analysis
+
+## 8. Open Questions & Decisions
+- How to effectively evaluate the quality of recommended YouTube videos?
+- How to balance repetition of concepts with preventing memorization in tests?
 - Should we focus on specific subject areas first or build a general-purpose platform?
-- How to handle subjects that don't have quality YouTube content?
-- What's the right balance between test frequency and learning time?
+- How to handle domains that don't have quality YouTube content?
+- What's the right balance between testing frequency and resource study time?
 - How to ensure tests are truly measuring understanding rather than recall?
 - What additional premium features would provide the most value to users?
 - How can we integrate ads without disrupting the learning experience?
 - What is the optimal ad frequency that balances revenue with user experience?
 - How to price institutional/enterprise plans competitively?
 - What referral incentives would be most effective for our target audience?
+- How to best leverage Google account data to personalize the initial experience?
+- What approach to take for users without Google accounts in future versions?
+- How many alternative resources should we offer if a user marks content as unhelpful?

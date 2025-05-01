@@ -3,9 +3,68 @@ description:
 globs: 
 alwaysApply: false
 ---
-# Database Schema Evolution Guide
+# Database Schema
 
-This project uses a frontend-driven approach to database design. The schema will evolve based on UI needs.
+The TestDrivenLearning platform uses Supabase PostgreSQL for data storage with the following schema:
+
+## User-Related Tables
+
+- **users**
+  - Primary user account information
+  - Google authentication details
+  - Created by Supabase Auth
+
+- **profiles**
+  - Extended user information
+  - Preferences and settings
+  - References active learning domain
+
+- **subscriptions**
+  - Subscription status and plan details
+  - Stripe subscription references
+  - Billing information
+
+## Learning Content Tables
+
+- **domains**
+  - Learning areas/subjects
+  - User-specific learning interests
+  - Enables multi-domain learning (post-MVP)
+
+- **goals**
+  - Learning objectives
+  - Linked to specific domains
+  - Target completion dates
+
+- **tests**
+  - Assessment questions and answers
+  - Difficulty levels
+  - Knowledge topics/tags
+  - Question types (multiple choice, open-ended)
+
+- **resources**
+  - YouTube video references
+  - Resource metadata
+  - Topic/concept coverage
+  - Difficulty level
+
+## Progress Tracking Tables
+
+- **user_progress**
+  - Test completion status
+  - Resource consumption
+  - Last accessed timestamps
+  - User notes and annotations
+
+- **test_results**
+  - User responses to test questions
+  - Knowledge gap identification
+  - Performance metrics
+
+- **resource_feedback**
+  - Helpful/not helpful ratings
+  - Specific feedback categories
+  - Alternative resource requests
 
 ## Database Structure
 
