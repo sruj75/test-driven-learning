@@ -1,0 +1,51 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Test-Driven Learning Platform Development Guide
+
+## Project Philosophy
+
+This project follows a frontend-first, user experience-driven approach. We start by designing and implementing the user interface and experience, then adapt our backend to support that experience. The implementation plan is documented in [progress.md](mdc:progress.md).
+
+## Project Structure
+
+### Frontend Components
+
+The UI is built with Next.js and TailwindCSS, focusing on these key user flows:
+- Onboarding and authentication
+- Test-taking interface
+- Results visualization
+- Learning recommendations
+
+Components should be modular, reusable, and follow the design system. Use mock data initially before backend integration.
+
+### Authentication
+
+Authentication is implemented using Supabase UI Library components, particularly the Password-based Authentication block. The frontend authentication flow should be built first with mock functionality before connecting to Supabase.
+
+### Database Structure
+
+The database schema will evolve based on frontend requirements. We use Supabase's PostgreSQL with both relational tables and JSONB columns for flexibility. Schema definitions will be stored in the `supabase/schemas` directory as declarative schemas.
+
+### State Management
+
+Frontend state should be managed using React's built-in state management with Context API for global state. Consider local storage for test progress persistence before backend integration.
+
+## Development Workflow
+
+1. Start with UI components and user flows
+2. Create interactive frontend with mock data
+3. Implement frontend state management
+4. Integrate Supabase for backend functionality
+5. Connect authentication and data persistence
+6. Implement LLM integration for test generation
+
+## Key Technology Resources
+
+- [Next.js Documentation](mdc:https:/nextjs.org/docs)
+- [TailwindCSS Documentation](mdc:https:/tailwindcss.com/docs)
+- [Supabase UI Library](mdc:https:/supabase.com/ui)
+- [Supabase Auth Documentation](mdc:https:/supabase.com/docs/guides/auth)
+- [Declarative Database Schemas](mdc:https:/supabase.com/docs/guides/local-development/declarative-database-schemas)
