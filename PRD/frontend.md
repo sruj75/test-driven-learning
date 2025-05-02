@@ -135,6 +135,19 @@ The recurring test-resource cycle is a critical component of our platform:
    - Consistently negative feedback removes resources from rotation
    - Follow-up tests to validate learning and identify remaining gaps
 
+## Post-MVP Playground Enhancements
+- Transform the Resource screen into an interactive Playground where users complete a personalized to-do list of tasks (videos, summaries, reading).
+- Features:
+  - Adaptive to-do list based on test-identified knowledge gaps
+  - YouTube video tasks with "Watched" tracking and helpful/not helpful feedback
+  - LLM-generated video summaries and AI-generated reading materials ("chapters")
+  - In-app AI Tutor chat for real-time Q&A during Playground sessions
+  - Task completion gating before proceeding to the next test
+- UI & Technical Considerations:
+  - New Playground API integrating YouTube Data API, LLM endpoints, and task management
+  - State management for test-playground transitions and task progress
+  - New UI components: task list, chat interface, summary modules
+
 ## Implementation Priorities
 
 ### Phase 1: Core User Flows (Weeks 1-2)

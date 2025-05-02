@@ -38,6 +38,9 @@ TestDrivenLearning is a comprehensive learning platform that provides personaliz
   - `profile/` - User profile management
     - `page.tsx` - Profile information and settings
     - `subscription.tsx` - Subscription management
+  - `test-playground/` - Folder for our Test ↔ Playground cycle
+    - `test/` - Test screens and components
+    - `playground/` - Resource/Playground screens and components
 
 #### Layout Structure
 - `components/`

@@ -193,6 +193,20 @@
   - Predictive learning path optimization
   - Detailed strength/weakness analysis
 
+### Enhanced Learning Playground
+- Description: Transform the "Resources" screen into a dynamic "Playground" where users complete a personalized to-do list of tasks (videos, summaries, reading).
+- Features:
+  - Adaptive to-do list based on identified knowledge gaps
+  - YouTube video tasks with "Watched" tracking and helpful/not helpful feedback
+  - LLM-generated summaries for YouTube videos
+  - LLM-generated reading materials ("chapters") when videos are unavailable or as supplemental content
+  - In-app AI Tutor chat for real-time Q&A during Playground sessions
+  - Task completion tracking before returning to the next test
+- Implementation Considerations:
+  - New Playground API combining YouTube Data API, LLM endpoints, and task management
+  - State management for test-playground transitions and task progress
+  - UI components for task lists, chat interface, and summary modules
+
 ## 8. Open Questions & Decisions
 - How to effectively evaluate the quality of recommended YouTube videos?
 - How to balance repetition of concepts with preventing memorization in tests?
