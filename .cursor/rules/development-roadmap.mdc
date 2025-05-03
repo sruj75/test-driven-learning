@@ -12,19 +12,28 @@ The TestDrivenLearning platform will be developed in phases, with clear prioriti
 Focus on the core test-driven learning experience:
 
 1. **Landing Page & Chat**
+   - TypeScript/TSX implementation
    - Conversational goal-setting interface
    - Learning journey draft creation
 
 2. **Authentication**
    - Google OAuth integration via Supabase
    - Profile creation and management
+   - Secure session handling
 
 3. **Core Testing Features**
-   - Basic assessment generation
+   - Test generation and presentation
    - Knowledge gap identification
-   - YouTube video recommendations
+   - Audio-based resource recommendations
+   - Resource feedback collection
 
-4. **Subscription**
+4. **Test-Resource Cycle**
+   - Implementation of the recurring test-resource flow
+   - Resource helpfulness feedback
+   - Alternative resource recommendations
+   - Progress tracking between tests
+
+5. **Subscription**
    - Basic subscription plans
    - Stripe payment integration
    - Access control for paid content
@@ -35,13 +44,13 @@ Planned enhancements after initial release:
 
 1. **Multi-Domain Learning**
    - Support for multiple subject areas
-   - Domain-specific dashboards
+   - Domain-specific test sequences
    - Cross-domain progress tracking
 
 2. **Enhanced Analytics**
    - Learning pattern identification
-   - Detailed progress visualization
-   - Performance predictions
+   - Detailed test performance visualization
+   - Resource effectiveness metrics
 
 3. **Social Features**
    - Study groups
@@ -49,6 +58,6 @@ Planned enhancements after initial release:
    - Knowledge sharing
 
 4. **Mobile Optimization**
-   - Responsive redesign
+   - Responsive TSX components
    - Progressive web app features
    - Offline capabilities

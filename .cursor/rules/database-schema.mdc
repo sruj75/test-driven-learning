@@ -43,7 +43,7 @@ The TestDrivenLearning platform uses Supabase PostgreSQL for data storage with t
   - Question types (multiple choice, open-ended)
 
 - **resources**
-  - YouTube video references
+  - Audio resource references
   - Resource metadata
   - Topic/concept coverage
   - Difficulty level
@@ -82,7 +82,7 @@ The database will be implemented in Supabase PostgreSQL with these main componen
 - Question tagging for concept mapping
 
 ### Learning Resources
-- YouTube video recommendations
+- Audio-based resource recommendations
 - Resource engagement tracking
 - User feedback on resource quality
 

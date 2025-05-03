@@ -22,7 +22,7 @@ The project requirements and architecture are defined in:
 - **Database**: Supabase PostgreSQL
 - **Payment**: Stripe
 - **AI**: Groq Cloud API (using OpenAI library)
-- **Video**: YouTube API
+- **Audio/Voice**: OpenAI Text-to-Speech & Speech-to-Text API
 - **Styling**: TailwindCSS
 
 ## Core Learning Flow
@@ -30,7 +30,7 @@ The project requirements and architecture are defined in:
 The platform follows a test-first approach to learning:
 
 1. User takes a test to identify knowledge gaps
-2. System recommends YouTube videos and learning resources
+2. System recommends audio-based learning resources
 3. User marks resources as helpful/not helpful
 4. System provides alternative resources if needed
 5. After learning, user takes another test

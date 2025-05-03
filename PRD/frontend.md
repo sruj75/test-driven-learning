@@ -13,7 +13,7 @@ Our test-driven learning platform will be built as a **web-first application** d
 - **Authentication**: Supabase Auth with Google OAuth
 - **Payment Processing**: Stripe
 - **AI Integration**: Groq Cloud API (using OpenAI library)
-- **Video Content**: YouTube API
+- **Audio/Voice Content**: OpenAI Text-to-Speech & Speech-to-Text API
 - **Deployment**: Vercel
 
 ## User Journey - Detailed Flow
@@ -85,16 +85,16 @@ Our test-driven learning platform will be built as a **web-first application** d
 **Test-Resource Learning Cycle Components:**
 - Knowledge assessment tests with conversational UI
 - Knowledge gap visualization after test completion
-- YouTube video and resource recommendations based on identified gaps
+- Voice-based prompts and interactive audio exercises based on identified gaps
 - Resource interface with feedback controls:
-  - "Watched" button to mark completed videos
+  - "Listened" button to mark completed audio segments
   - "Helpful/Not Helpful" rating options
   - Detailed feedback categories for unhelpful content
   - Option to request alternative explanations
 
 **Technical Implementation:**
 - Dashboard components with data visualization
-- YouTube API integration for video content
+- OpenAI Text-to-Speech integration for audio content
 - Feedback collection system with database storage
 - Progress tracking and persistence
 - Recommendation engine using collected feedback data
@@ -111,14 +111,14 @@ The recurring test-resource cycle is a critical component of our platform:
    - Adapt difficulty based on user performance
 
 2. **Resource Recommendation**
-   - Match YouTube videos and learning resources to specific knowledge gaps
+   - Match interactive audio segments and voice-guided resources to specific knowledge gaps
    - Filter for quality based on metrics (views, ratings, educational markers)
    - Present in order of relevance to learning needs
    - Include diverse content types for different learning styles
 
 3. **User Feedback Collection**
    - Simple but comprehensive feedback UI:
-     - "Watched" button to track completion
+     - "Listened" button to track completion
      - "Helpful" thumbs up button
      - "Not Helpful" with dropdown for specific reasons:
        - Too advanced
@@ -139,12 +139,12 @@ The recurring test-resource cycle is a critical component of our platform:
 - Transform the Resource screen into an interactive Playground where users complete a personalized to-do list of tasks (videos, summaries, reading).
 - Features:
   - Adaptive to-do list based on test-identified knowledge gaps
-  - YouTube video tasks with "Watched" tracking and helpful/not helpful feedback
+  - Audio task segments with "Listened" tracking and helpful/not helpful feedback
   - LLM-generated video summaries and AI-generated reading materials ("chapters")
   - In-app AI Tutor chat for real-time Q&A during Playground sessions
   - Task completion gating before proceeding to the next test
 - UI & Technical Considerations:
-  - New Playground API integrating YouTube Data API, LLM endpoints, and task management
+  - New Playground API integrating OpenAI Speech APIs, LLM endpoints, and task management
   - State management for test-playground transitions and task progress
   - New UI components: task list, chat interface, summary modules
 
@@ -159,7 +159,7 @@ The recurring test-resource cycle is a critical component of our platform:
 ### Phase 2: Test-Resource Cycle (Weeks 3-4)
 - Test interface with conversational UI
 - Knowledge gap visualization
-- YouTube resource recommendations
+- Voice resource recommendations
 - Resource feedback collection mechanism
 
 ### Phase 3: Subscription & Enhancements (Weeks 5-6)

@@ -25,15 +25,15 @@ The TestDrivenLearning platform integrates with several external APIs to provide
   - Personalized concept explanations
 - Responses are cached to optimize costs
 
-## YouTube API
 
-- Used to retrieve educational video resources
+## Audio API (OpenAI Speech)
+
+- Used to retrieve educational audio resources
 - Features:
-  - Video search based on knowledge gaps
-  - Metadata retrieval for relevance scoring
-  - Embedded video player integration
-  - Progress tracking (watched/unwatched)
-  - Alternative video recommendation
+  - Text-to-speech generation for explanations
+  - Speech-to-text processing for user responses
+  - Progress tracking (listened/unlistened)
+  - Alternative audio recommendation
 
 ## Stripe (Payment Processing)
 

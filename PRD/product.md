@@ -1,7 +1,7 @@
 # Product Requirements Document: Test-Driven Learning
 
 ## 1. Product Overview
-- **Product Name**: TestLearn (tentative)
+- **Product Name**: hyper-mind project
 - **Product Vision**: Revolutionize learning by flipping the traditional model - make tests the starting point rather than the endpoint of learning, creating a personalized, efficient, and goal-driven educational experience.
 - **Target Audience**: 
   - University students across disciplines (Computer Science, Engineering, Business, Humanities, etc.)
@@ -28,7 +28,7 @@
    - Visualizes strengths and weaknesses
 
 4. **Personalized Learning Resources**
-   - Recommends specific YouTube videos based on identified gaps
+   - Recommends specific interactive audio segments based on identified gaps
    - Provides concise AI-generated explanations of concepts when needed
    - Alternative resource recommendations when feedback indicates resource wasn't helpful
 
@@ -56,7 +56,7 @@
    - User sets a learning goal ("I want to learn JavaScript")
    - Signs in with Google account
    - Takes initial assessment test
-   - Receives personalized learning resources (YouTube videos, explanations)
+   - Receives personalized audio learning resources (voice explanations, exercises)
    - Studies resources and marks them as helpful/not helpful
    - Takes follow-up test targeting identified gaps
    - Cycle continues until mastery
@@ -79,12 +79,12 @@
   - Frontend: Next.js with TypeScript/TSX and TailwindCSS
   - Backend: Next.js API routes
   - AI/LLM: Groq Cloud API (using OpenAI library compatibility)
-  - External APIs: YouTube Data API, Google OAuth
+  - External APIs: OpenAI Speech API, Google OAuth
   - Database: Supabase/PostgreSQL for user data and progress
   - Authentication: Supabase Auth with Google OAuth integration
 
 - **Integration Requirements**:
-  - YouTube API for resource recommendations
+  - OpenAI Text-to-Speech & Speech-to-Text API for resource recommendations
   - Groq Cloud API for test generation and concept explanations
   - Google OAuth for authentication
   - Stripe for subscription management
@@ -139,7 +139,7 @@
   - Basic goal selection from predefined list
   - Google OAuth integration
   - Initial test generation for limited domains
-  - YouTube video recommendations based on test results
+  - Voice resource (audio segment) recommendations based on test results
   - Resource feedback collection
   - Basic test-resource cycle implementation
   - Simple subscription model with early adopter pricing
@@ -197,21 +197,21 @@
 - Description: Transform the "Resources" screen into a dynamic "Playground" where users complete a personalized to-do list of tasks (videos, summaries, reading).
 - Features:
   - Adaptive to-do list based on identified knowledge gaps
-  - YouTube video tasks with "Watched" tracking and helpful/not helpful feedback
-  - LLM-generated summaries for YouTube videos
+  - Audio tasks with "Listened" tracking and helpful/not helpful feedback
+  - LLM-generated audio transcripts and summaries
   - LLM-generated reading materials ("chapters") when videos are unavailable or as supplemental content
   - In-app AI Tutor chat for real-time Q&A during Playground sessions
   - Task completion tracking before returning to the next test
 - Implementation Considerations:
-  - New Playground API combining YouTube Data API, LLM endpoints, and task management
+  - New Playground API combining OpenAI Speech APIs, LLM endpoints, and task management
   - State management for test-playground transitions and task progress
   - UI components for task lists, chat interface, and summary modules
 
 ## 8. Open Questions & Decisions
-- How to effectively evaluate the quality of recommended YouTube videos?
+- How to effectively evaluate the quality of recommended audio segments?
 - How to balance repetition of concepts with preventing memorization in tests?
 - Should we focus on specific subject areas first or build a general-purpose platform?
-- How to handle domains that don't have quality YouTube content?
+- How to handle domains that don't have quality audio content?
 - What's the right balance between testing frequency and resource study time?
 - How to ensure tests are truly measuring understanding rather than recall?
 - What additional premium features would provide the most value to users?
