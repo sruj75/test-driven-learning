@@ -1,41 +1,41 @@
 'use client';
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import { create } from 'zustand';
 
 // Define types
-type Concept = string;
+export type Concept = string;
 
-interface RoadmapStep {
+export interface RoadmapStep {
   stepNumber: number;
   title: string;
   concepts: Concept[];
   estimatedDays: number;
 }
 
-interface Roadmap {
+export interface Roadmap {
   roadmap: RoadmapStep[];
   totalEstimatedDays: number;
 }
 
-interface Question {
+export interface Question {
   id: string;
   question: string;
   type: string;
 }
 
-interface Video {
-  id: string; 
+export interface Video {
+  id: string;
   title: string;
   url: string;
 }
 
-interface Task {
+export interface Task {
   topic: string;
   videos: Video[];
   explanation: string;
   completed: boolean;
 }
 
-interface RoadmapContextType {
+interface RoadmapState {
   roadmap: Roadmap | null;
   currentStepIndex: number;
   questions: Question[];
@@ -49,105 +49,62 @@ interface RoadmapContextType {
   markTaskCompleted: (index: number) => void;
 }
 
-const RoadmapContext = createContext<RoadmapContextType | undefined>(undefined);
+// Helpers to get initial persisted state
+const getInitialRoadmap = (): Roadmap | null => {
+  if (typeof window === 'undefined') return null;
+  const stored = localStorage.getItem('roadmap');
+  return stored ? JSON.parse(stored) : null;
+};
 
-export function RoadmapProvider({ children }: { children: React.ReactNode }) {
-  const [roadmap, setRoadmapState] = useState<Roadmap | null>(null);
-  const [currentStepIndex, setCurrentStepIndexState] = useState(0);
-  const [questions, setQuestions] = useState<Question[]>([]);
-  // Store tasks separately for each roadmap step
-  const [tasksByStep, setTasksByStep] = useState<Record<number, Task[]>>({});
-  const [gaps, setGapsState] = useState<string[]>([]);
+const getInitialIndex = (): number => {
+  if (typeof window === 'undefined') return 0;
+  const stored = localStorage.getItem('currentStepIndex');
+  return stored ? parseInt(stored, 10) : 0;
+};
 
-  // Load persisted roadmap and index from localStorage once on mount
-  useEffect(() => {
-    const storedRoadmap = localStorage.getItem('roadmap');
-    const storedIndex = localStorage.getItem('currentStepIndex');
-    if (storedRoadmap) {
-      setRoadmapState(JSON.parse(storedRoadmap));
-    }
-    if (storedIndex) {
-      setCurrentStepIndexState(parseInt(storedIndex, 10));
-    }
-  }, []);
+const getInitialTasks = (): Task[] => {
+  if (typeof window === 'undefined') return [];
+  const stored = localStorage.getItem('tasks');
+  return stored ? JSON.parse(stored) : [];
+};
 
-  const markTaskCompleted = (index: number) => {
-    setTasksByStep(prevMap => {
-      const current = prevMap[currentStepIndex] || [];
-      const updated = [...current];
-      updated[index] = { ...updated[index], completed: true };
-      const newMap = { ...prevMap, [currentStepIndex]: updated };
-      localStorage.setItem('tasksByStep', JSON.stringify(newMap));
-      return newMap;
-    });
-  };
+export const useRoadmap = create<RoadmapState>((set, get) => ({
+  roadmap: getInitialRoadmap(),
+  currentStepIndex: getInitialIndex(),
+  questions: [],
+  tasks: getInitialTasks(),
+  gaps: [],
 
-  // Wrap setters to persist
-  const setRoadmap = (rm: Roadmap) => {
-    setRoadmapState(rm);
-    localStorage.setItem('roadmap', JSON.stringify(rm));
-  };
+  setRoadmap: (roadmap: Roadmap) => {
+    localStorage.setItem('roadmap', JSON.stringify(roadmap));
+    set({ roadmap });
+  },
 
-  // Wrap setter to persist and reset per-step data
-  const setCurrentStepIndex = (idx: number) => {
-    setCurrentStepIndexState(idx);
-    localStorage.setItem('currentStepIndex', idx.toString());
-    // Reset data for the new step only
-    setTasks([]); // clears tasks for current idx
-    setQuestions([]);
-    setGapsState([]);
-  };
+  setCurrentStepIndex: (currentStepIndex: number) => {
+    localStorage.setItem('currentStepIndex', currentStepIndex.toString());
+    // Reset step-specific data
+    set({ currentStepIndex, questions: [], tasks: [], gaps: [] });
+  },
 
-  // Wrap tasks setter to persist
-  const setTasks = (ts: Task[]) => {
-    setTasksByStep(prevMap => {
-      const newMap = { ...prevMap, [currentStepIndex]: ts };
-      localStorage.setItem('tasksByStep', JSON.stringify(newMap));
-      return newMap;
-    });
-  };
+  setQuestions: (questions: Question[]) => {
+    set({ questions });
+  },
 
-  // Gaps setter (persist optional)
-  const setGaps = (newGaps: string[]) => {
-    setGapsState(newGaps);
-    // optionally persist: localStorage.setItem('gaps', JSON.stringify(newGaps));
-  };
+  setGaps: (gaps: string[]) => {
+    set({ gaps });
+  },
 
-  // Load stored tasks on mount
-  useEffect(() => {
-    const stored = localStorage.getItem('tasksByStep');
-    if (stored) setTasksByStep(JSON.parse(stored));
-    // TODO: load gaps if persisted per step
-  }, []);
+  setTasks: (tasks: Task[]) => {
+    localStorage.setItem('tasks', JSON.stringify(tasks));
+    set({ tasks });
+  },
 
-  // Derive current tasks for this step
-  const tasks = tasksByStep[currentStepIndex] || [];
-
-  return (
-    <RoadmapContext.Provider
-      value={{
-        roadmap,
-        currentStepIndex,
-        questions,
-        tasks,
-        gaps,
-        setRoadmap,
-        setCurrentStepIndex,
-        setQuestions,
-        setGaps,
-        setTasks,
-        markTaskCompleted
-      }}
-    >
-      {children}
-    </RoadmapContext.Provider>
-  );
-}
-
-export function useRoadmap() {
-  const context = useContext(RoadmapContext);
-  if (context === undefined) {
-    throw new Error('useRoadmap must be used within a RoadmapProvider');
-  }
-  return context;
-} 
+  markTaskCompleted: (index: number) => {
+    const { tasks } = get();
+    const newTasks = tasks.map((t: Task, i: number) =>
+      i === index ? { ...t, completed: true } : t
+    );
+    localStorage.setItem('tasks', JSON.stringify(newTasks));
+    set({ tasks: newTasks });
+  },
+})); 
