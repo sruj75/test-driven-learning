@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import client, { MODEL_NAME } from '../../services/openaiClient';
+import { cleanLLMOutput } from '../../lib/llmUtils';
 import type { Question } from '../../services/ai';
 
 export async function POST(request: Request) {
@@ -23,23 +24,14 @@ export async function POST(request: Request) {
       temperature: 0.7
     });
     
-    let content = response.choices[0].message.content;
-    if (!content || typeof content !== 'string') {
-      throw new Error('Invalid response from LLM');
-    }
-    // Strip code fences/backticks
-    content = content.trim();
-    if (content.startsWith('```')) {
-      content = content.replace(/^```[\s\S]*?\n/, '').replace(/```$/, '').trim();
-    }
-    if (content.startsWith('`') && content.endsWith('`')) {
-      content = content.slice(1, -1).trim();
-    }
+    // Clean and parse JSON array of questions
+    const raw = cleanLLMOutput(response.choices[0].message.content || '');
     let questions: Question[];
     try {
-      const parsed = JSON.parse(content);
+      const parsed = JSON.parse(raw);
       questions = Array.isArray(parsed) ? parsed : [];
     } catch (e) {
+      console.error('Failed to parse questions JSON:', e, 'raw:', raw);
       throw new Error(`Failed to parse questions JSON: ${e}`);
     }
     

@@ -1,66 +1,80 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import client, { MODEL_NAME } from '../../services/openaiClient';
+import { cleanLLMOutput } from '../../lib/llmUtils';
 
-export async function POST(request: Request) {
+export async function POST(req: NextRequest) {
   try {
-    const { conversation } = await request.json();
-    
-    // Use full conversation; initial goal is first user message
-    const initialGoal = conversation[0] || "learning programming";
-    
-    // Build LLM messages: include system prompt, entire conversation, then roadmap request
-    const messages = [
-      {
-        role: "system",
-        content: `You are an AI learning path specialist. Based on the user's above conversation, create a customized, domain-specific learning roadmap that directly addresses their goal "${initialGoal}".
-Focus each step title and concepts on the user's topic, avoid generic placeholders.`
-      },
-      // Include full user conversation for context
-      ...conversation.map((content: string) => ({ role: "user", content })),
-      {
-        role: "user",
-        content: `Now, create a personalized learning roadmap:
+    const { conversation } = await req.json();
+    // Enhanced system prompt to utilize personalized data from conversation
+    const systemPrompt = `
+You are an expert curriculum designer who creates personalized learning paths.
 
-1. Include 3-5 clear steps specific to "${initialGoal}".
-2. Provide time estimates for each step.
-3. List core concepts to master in each step.
-4. Ensure progression reflects dependencies between concepts.
+TASK:
+Analyze the user's conversation to identify their specific needs, including:
+1. What they want to learn (topic, skills, technologies)
+2. Their timeline expectations (how quickly they need to learn)
+3. Their background and experience level
+4. Their ultimate goal (job, project, etc.)
+5. How in-depth they want to go
 
-Return JSON:
+Then, generate a personalized JSON roadmap with milestones. Each milestone should have:
+- A clear, specific "name" that shows progression
+- An array of "topics" that build skills incrementally 
+- Topics appropriate to their experience level and timeline
+- Practical, applicable content aligned with their goals
+
+FORMAT:
+The output must be valid JSON only, with this structure:
 {
-  "roadmap": [
-    { "stepNumber": 1, "title": "Step Title", "concepts": ["Concept1","Concept2"], "estimatedDays": number }
-  ],
-  "totalEstimatedDays": number
-}`
-      }
+  "milestones": [
+    {
+      "name": "Milestone Name That Shows Progression",
+      "topics": ["Specific Topic 1", "Specific Topic 2", ...]
+    },
+    ...
+  ]
+}
+
+GUIDELINES:
+- For beginners: Include more fundamentals and smaller steps
+- For experienced learners: Skip basics and focus on advanced topics
+- For quick timelines: Streamline to essential, practical knowledge
+- For in-depth learning: Include theoretical foundations
+- For job seekers: Emphasize industry-relevant skills and projects
+- For hobbyists: Focus on creative applications and quick wins
+
+Return only valid JSON, no additional text.
+`;
+
+    // Build chat messages, including all user messages for context
+    const messages = [
+      { role: 'system', content: systemPrompt },
+      ...conversation.map((msg: string) => ({ role: 'user', content: msg }))
     ];
+
+    // Call the LLM with increased token count for more detailed roadmaps
     const response = await client.chat.completions.create({
       model: MODEL_NAME,
       messages,
       temperature: 0.7,
-      response_format: { type: "json_object" }
+      max_tokens: 1200,
     });
-    
-    const content = response.choices[0].message.content;
-    if (content === undefined || content === null) {
-      throw new Error("Empty response from LLM");
+
+    // Clean raw output
+    const raw = cleanLLMOutput(response.choices?.[0]?.message?.content || '');
+
+    let parsed;
+    try {
+      parsed = JSON.parse(raw || '{}');
+    } catch (parseError) {
+      console.error('Invalid JSON from LLM after cleaning:', parseError, 'raw:', raw);
+      return NextResponse.json({ error: 'Invalid JSON from LLM', raw }, { status: 500 });
     }
-    
-    // Content may already be an object (json_object) or a string
-    let parsedResult;
-    if (typeof content === 'string') {
-      parsedResult = JSON.parse(content);
-    } else {
-      parsedResult = content;
-    }
-    return NextResponse.json(parsedResult);
-  } catch (error: unknown) {
-    console.error("Error generating roadmap:", error);
-    const errorMessage = error instanceof Error ? error.message : String(error);
-    return NextResponse.json(
-      { error: errorMessage || "Failed to generate roadmap" },
-      { status: 500 }
-    );
+
+    return NextResponse.json(parsed);
+  } catch (error) {
+    console.error('Roadmap API error:', error);
+    const message = error instanceof Error ? error.message : String(error);
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 } 

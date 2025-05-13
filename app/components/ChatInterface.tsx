@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { generateRoadmap } from '../services/ai';
 import { useRoadmap } from '../contexts/RoadmapContext';
@@ -13,14 +13,29 @@ interface Message {
   content: string;
 }
 
+// We'll remove the fixed MIN_MESSAGES constant and make the experience more dynamic
+// const MIN_MESSAGES_FOR_ROADMAP = 4; 
+
 export default function ChatInterface() {
   const [messages, setMessages] = useState<Message[]>([
-    {role: 'assistant', content: 'Hi! I\'m your AI learning assistant. What would you like to learn today?'}
+    {role: 'assistant', content: 'Hey there! What are you interested in learning these days?'}
   ]);
   const [input, setInput] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
+  // Rename this to better reflect its purpose - showing the roadmap button, not claiming readiness
+  const [showRoadmapOption, setShowRoadmapOption] = useState(false);
   const { setRoadmap } = useRoadmap();
   const router = useRouter();
+
+  // Simply show roadmap option after minimal conversation
+  useEffect(() => {
+    const userMessages = messages.filter(m => m.role === 'user');
+    
+    // Show the option after the first user message
+    if (userMessages.length >= 1 && !showRoadmapOption) {
+      setShowRoadmapOption(true);
+    }
+  }, [messages, showRoadmapOption]);
 
   const handleSendMessage = async () => {
     if (!input.trim()) return;
@@ -68,7 +83,7 @@ export default function ChatInterface() {
 
   return (
     <div className="flex flex-col space-y-4">
-      <div className="flex-1 space-y-4">
+      <div className="flex-1 space-y-4 max-h-[400px] overflow-y-auto p-1">
         {messages.map((message, index) => (
           <div
             key={index}
@@ -95,6 +110,7 @@ export default function ChatInterface() {
           </div>
         )}
       </div>
+      
       <div className="flex gap-2">
         <div className="flex-1">
           <input
@@ -114,14 +130,23 @@ export default function ChatInterface() {
         >
           Send
         </Button>
-        <Button
-          onClick={handleGenerateRoadmap}
-          disabled={isGenerating || messages.length < 2}
-          variant="secondary"
-        >
-          Generate Roadmap
-        </Button>
+        {showRoadmapOption && (
+          <Button
+            onClick={handleGenerateRoadmap}
+            disabled={isGenerating}
+            variant="secondary"
+            className="whitespace-nowrap"
+          >
+            Create Learning Path
+          </Button>
+        )}
       </div>
+      
+      {showRoadmapOption && (
+        <div className="text-sm text-gray-600 dark:text-gray-400 text-center">
+          The more you tell me about your goals and experience, the more personalized your learning path will be.
+        </div>
+      )}
     </div>
   );
 } 

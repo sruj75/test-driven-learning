@@ -19,16 +19,22 @@ export interface Task {
 }
 
 // Types for the roadmap
-export interface RoadmapStep {
-  stepNumber: number;
-  title: string;
-  concepts: string[];
-  estimatedDays: number;
+export interface Milestone {
+  name: string;
+  topics: string[];
 }
 
 export interface Roadmap {
-  roadmap: RoadmapStep[];
-  totalEstimatedDays: number;
+  milestones: Milestone[];
+}
+
+// Types for knowledge assessment
+export interface KnowledgeAssessment {
+  understandingScore: number; // 0-100 representing completeness of understanding
+  identifiedGaps: string[]; // Array of specific knowledge gaps
+  feedback: string; // Conversational feedback
+  nextSteps: string; // Recommendation on what to study next
+  readyToProgress: boolean; // Whether they can move to the next topic
 }
 
 /**
@@ -97,6 +103,28 @@ export async function generateResources(gaps: string[]): Promise<Task[]> {
   }
   const data = await response.json();
   return data.resources;
+}
+
+/**
+ * Measures understanding and identifies knowledge gaps based on a question and answer
+ */
+export async function measureUnderstanding(question: string, answer: string, context: string): Promise<KnowledgeAssessment> {
+  const response = await fetch('/api/measure', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ 
+      question, 
+      answer, 
+      context
+    }),
+  });
+  
+  if (!response.ok) {
+    const errorBody = await response.json().catch(() => ({}));
+    throw new Error(errorBody.error || `Measure API error: ${response.status}`);
+  }
+  
+  return response.json();
 }
 
 /**

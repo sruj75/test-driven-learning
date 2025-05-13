@@ -23,7 +23,7 @@ export default function RootLayout({
         <ThemeProvider defaultTheme="system" storageKey="ui-theme">
           <header className="border-b bg-background">
             <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-              <h1 className="text-xl font-bold">Test-Driven Learning</h1>
+              <h1 className="text-xl font-bold">AI Learning</h1>
               <ThemeToggle />
             </div>
           </header>

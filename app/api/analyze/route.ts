@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import client, { MODEL_NAME } from '../../services/openaiClient';
+import { cleanLLMOutput } from '../../lib/llmUtils';
 import type { Question } from '../../services/ai';
 
 // Using shared Groq-compatible OpenAI client and model
@@ -36,28 +37,14 @@ export async function POST(request: Request) {
       temperature: 0.0
     });
     
-    const content = response.choices[0].message.content;
-    if (!content || typeof content !== 'string') {
-      throw new Error('Invalid LLM response for gap analysis');
-    }
-    // Clean up content: remove triple backticks or single backticks/code fences
-    let text = content.trim();
-    // Remove ```json or ``` fenced code blocks
-    if (text.startsWith('```')) {
-      text = text
-        .replace(/^```[\s\S]*?\n/, '')  // remove opening ``` and optional language
-        .replace(/```$/, '').trim();       // remove closing ```
-    }
-    // Remove single backticks around JSON
-    if (text.startsWith('`') && text.endsWith('`')) {
-      text = text.slice(1, -1).trim();
-    }
+    // Clean and parse JSON output
+    const raw = cleanLLMOutput(response.choices[0].message.content || '');
     let gaps: string[];
     try {
-      const parsed = JSON.parse(text);
+      const parsed = JSON.parse(raw);
       gaps = Array.isArray(parsed) ? parsed : [];
     } catch (e) {
-      console.error('Raw gap content:', text);
+      console.error('Failed to parse gaps JSON after cleaning:', e, 'raw:', raw);
       throw new Error(`Failed to parse gaps JSON: ${e}`);
     }
     

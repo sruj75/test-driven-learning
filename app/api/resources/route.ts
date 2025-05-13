@@ -20,21 +20,33 @@ export async function POST(request: Request) {
         messages: [
           {
             role: "system",
-            content: "You are an educational AI specializing in creating learning resources."
+            content: "You are a concise educational AI that creates focused learning resources using bullet points and minimal text. Format content for quick consumption, similar to effective marketing copy. Prioritize clarity and directness over comprehensive explanations."
           },
           {
             role: "user",
-            content: `Generate a comprehensive learning resource for the concept "${gap}".
-            Include:
-            1. A clear explanation in 2-3 paragraphs
-            2. 2-3 practical examples
-            3. Common misconceptions
-            4. A brief practice exercise
+            content: `Create a quick-scan learning resource for the concept "${gap}" that a user can consume in under 60 seconds.
             
-            Format your response with markdown headings and structure.`
+            Follow these STRICT formatting rules:
+            1. Start with 2-3 bullet points of key facts/definitions (1 sentence each)
+            2. Include 1 very brief code example or demonstration (if applicable)
+            3. Add 2-3 bullet points with practical applications or tips
+            4. End with 1-2 common misconceptions as bullet points
+
+            Use this structure:
+            * Key point 1
+            * Key point 2
+            
+            Example:
+            [brief example or code snippet]
+            
+            * Practical tip 1
+            * Practical tip 2
+            
+            * Common mistake: [misconception]`
           }
         ],
-        temperature: 0.7
+        temperature: 0.5,
+        max_tokens: 400 // Limit token count to enforce brevity
       });
       
       const content = response.choices[0].message.content;
@@ -42,16 +54,18 @@ export async function POST(request: Request) {
         throw new Error("Empty response from LLM");
       }
       
+      // Create mock video resources for reference (could be replaced with real API)
+      const mockVideos = [
+        {
+          id: `${gap.replace(/\s+/g, '-').toLowerCase()}-1`,
+          title: `Quick Guide to ${gap}`,
+          url: `https://example.com/learn/${gap.replace(/\s+/g, '-').toLowerCase()}`
+        }
+      ];
+      
       resources.push({
         topic: gap,
-        // Placeholder video data
-        videos: [
-          {
-            id: `vid-${Date.now()}-${Math.round(Math.random() * 1000)}`,
-            title: `Learn ${gap} - Placeholder (YouTube integration coming later)`,
-            url: "#"
-          }
-        ],
+        videos: mockVideos,
         explanation: content,
         completed: false
       });

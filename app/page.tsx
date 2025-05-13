@@ -7,11 +7,9 @@ export default function Home() {
       <Card className="w-full max-w-2xl">
         <CardHeader>
           <CardTitle className="text-center text-3xl font-bold">
-            Welcome to Test-Driven Learning
+            lets create your personalized learning path
           </CardTitle>
-          <p className="text-center text-muted-foreground">
-            Tell me what you want to learn, and I&apos;ll create a personalized learning path for you.
-          </p>
+
         </CardHeader>
         <CardContent>
           <ChatInterface />
