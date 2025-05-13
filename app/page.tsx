@@ -1,16 +1,22 @@
-import Image from 'next/image';
-import logo from './hyper mind project.png';
 import ChatInterface from './components/ChatInterface';
+import { Card, CardContent, CardHeader, CardTitle } from './components/ui/Card';
 
 export default function Home() {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-8">
-      {/* Logo at top */}
-      <div className="mb-6 flex justify-center">
-        <Image src={logo} alt="Hyper Mind Project Logo" width={150} height={150} />
-      </div>
-      <h1 className="text-3xl font-bold mb-6">HYPER-MIND PROJECT</h1>
-      <ChatInterface />
-    </main>
+    <div className="flex flex-col items-center justify-center space-y-8">
+      <Card className="w-full max-w-2xl">
+        <CardHeader>
+          <CardTitle className="text-center text-3xl font-bold">
+            Welcome to Test-Driven Learning
+          </CardTitle>
+          <p className="text-center text-muted-foreground">
+            Tell me what you want to learn, and I&apos;ll create a personalized learning path for you.
+          </p>
+        </CardHeader>
+        <CardContent>
+          <ChatInterface />
+        </CardContent>
+      </Card>
+    </div>
   );
 }

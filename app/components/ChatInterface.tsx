@@ -3,6 +3,8 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { generateRoadmap } from '../services/ai';
 import { useRoadmap } from '../contexts/RoadmapContext';
+import { Button } from './ui/Button';
+import { LoadingDots } from './ui/LoadingDots';
 
 type MessageRole = 'user' | 'assistant';
 
@@ -13,7 +15,7 @@ interface Message {
 
 export default function ChatInterface() {
   const [messages, setMessages] = useState<Message[]>([
-    {role: 'assistant', content: 'what do you want to learn?'}
+    {role: 'assistant', content: 'Hi! I\'m your AI learning assistant. What would you like to learn today?'}
   ]);
   const [input, setInput] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
@@ -23,12 +25,9 @@ export default function ChatInterface() {
   const handleSendMessage = async () => {
     if (!input.trim()) return;
     
-    // Add user message
-    const newMessages: Message[] = [...messages, {role: 'user' as MessageRole, content: input}];
+    const newMessages: Message[] = [...messages, {role: 'user', content: input}];
     setMessages(newMessages);
     setInput('');
-    
-    // Show loader
     setIsGenerating(true);
     
     try {
@@ -54,7 +53,6 @@ export default function ChatInterface() {
     if (messages.length === 0) return;
     setIsGenerating(true);
     try {
-      // Only include user messages for the roadmap initial goal
       const userMessages = messages
         .filter(m => m.role === 'user')
         .map(m => m.content);
@@ -69,46 +67,60 @@ export default function ChatInterface() {
   };
 
   return (
-    <div className="flex flex-col w-full max-w-2xl mx-auto h-[600px] border rounded-lg overflow-hidden">
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+    <div className="flex flex-col space-y-4">
+      <div className="flex-1 space-y-4">
         {messages.map((message, index) => (
-          <div key={index} className={`${message.role === 'user' ? 'ml-auto bg-blue-100' : 'mr-auto bg-gray-100'} rounded-lg p-3 max-w-[80%]`}>
-            {message.content}
+          <div
+            key={index}
+            className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+          >
+            <div
+              className={`
+                max-w-[80%] p-4 rounded-lg
+                ${message.role === 'user'
+                  ? 'bg-primary text-primary-foreground'
+                  : 'bg-muted text-foreground'
+                }
+              `}
+            >
+              {message.content}
+            </div>
           </div>
         ))}
         {isGenerating && (
-          <div className="mr-auto bg-gray-100 rounded-lg p-3">
-            <div className="flex space-x-2">
-              <div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse"></div>
-              <div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse delay-150"></div>
-              <div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse delay-300"></div>
+          <div className="flex justify-start">
+            <div className="bg-muted rounded-lg p-4">
+              <LoadingDots />
             </div>
           </div>
         )}
       </div>
-      <div className="border-t p-4 flex space-x-2">
-        <input
-          type="text"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
-          placeholder="Type your message..."
-          className="flex-1 border rounded-l-lg px-4 py-2 focus:outline-none"
-        />
-        <button
+      <div className="flex gap-2">
+        <div className="flex-1">
+          <input
+            type="text"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleSendMessage()}
+            placeholder="Type your message..."
+            className="w-full px-4 py-2 rounded-md border bg-background focus:outline-none focus:ring-2 focus:ring-primary"
+            disabled={isGenerating}
+          />
+        </div>
+        <Button
           onClick={handleSendMessage}
-          disabled={isGenerating}
-          className="bg-blue-500 text-white px-4 py-2 rounded disabled:bg-blue-300"
+          disabled={isGenerating || !input.trim()}
+          variant="default"
         >
           Send
-        </button>
-        <button
+        </Button>
+        <Button
           onClick={handleGenerateRoadmap}
-          disabled={isGenerating || messages.length === 0}
-          className="bg-green-500 text-white px-4 py-2 rounded disabled:bg-gray-300"
+          disabled={isGenerating || messages.length < 2}
+          variant="secondary"
         >
           Generate Roadmap
-        </button>
+        </Button>
       </div>
     </div>
   );
