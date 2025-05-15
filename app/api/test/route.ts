@@ -3,9 +3,15 @@ import client, { MODEL_NAME } from '../../services/openaiClient';
 import { cleanLLMOutput } from '../../lib/llmUtils';
 import type { Question } from '../../services/ai';
 
+// Simple message type for system/user prompts
+interface ChatMessage {
+  role: 'system' | 'user';
+  content: string;
+}
+
 export async function POST(request: Request) {
   try {
-    const { topic, concepts } = await request.json();
+    const { topic, concepts, context } = await request.json() as { topic: string; concepts: string[]; context?: string };
     
     if (!topic || !concepts || !Array.isArray(concepts)) {
       return NextResponse.json(
@@ -14,14 +20,16 @@ export async function POST(request: Request) {
       );
     }
     
-    // Request 2-3 questions, return a JSON array. No extra explanation.
+    // Build messages array for the AI call
+    const messages: ChatMessage[] = [
+      { role: 'system', content: `You are an assessment generator for young learners. ALWAYS write using simple English as if explaining to a 10-year-old child. Use short words, short sentences, and explain all concepts in the simplest possible way. Avoid technical jargon unless absolutely necessary, and when you must use it, define it immediately in plain language. Create exactly 2-3 clear questions about the user's current topic. Respond ONLY with a valid JSON array of objects: [{"id":"...","question":"...","type":"..."}, ...] and nothing else.` },
+      { role: 'user', content: `Topic: ${topic}${context ? `\nContext: ${context}` : ''}\nConcepts: ${concepts.join(', ')}\nOutput JSON array:` }
+    ];
+
     const response = await client.chat.completions.create({
       model: MODEL_NAME,
-      messages: [
-        { role: 'system', content: 'Generate 2-3 assessment questions for the user. Output ONLY a JSON array of question objects.' },
-        { role: 'user', content: `Topic: ${topic}\nConcepts: ${concepts.join(', ')}\nOutput JSON array:` }
-      ],
-      temperature: 0.7
+      messages,
+      temperature: 0.2
     });
     
     // Clean and parse JSON array of questions

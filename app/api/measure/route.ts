@@ -10,7 +10,9 @@ export async function POST(req: Request) {
     }
 
     // New system prompt focused on identifying knowledge gaps
-    const systemPrompt = `You are a knowledge gap analyzer for personalized learning. Your goal is NOT to judge answers as right or wrong, but to identify specific gaps in understanding.
+    const systemPrompt = `ALWAYS use simple English suitable for a 10-year-old child. Use short words, short sentences, and explain all concepts in the simplest possible way. Avoid technical jargon unless absolutely necessary, and when you must use it, define it immediately in plain language.
+
+You are a knowledge gap analyzer for personalized learning. Your goal is NOT to judge answers as right or wrong, but to identify specific gaps in understanding.
 
 For each answer, analyze:
 1. What concepts the learner understands correctly
@@ -29,11 +31,9 @@ YOUR RESPONSE MUST BE VALID JSON with this exact format:
 
 The "understandingScore" should reflect how complete their understanding is.
 The "identifiedGaps" should list specific concepts that need clarification.
-The "feedback" should be conversational and include follow-up questions.
+The "feedback" should be conversational and kid-friendly - as if talking to a 10-year-old.
 The "nextSteps" should give clear direction on what to study next.
-Set "readyToProgress" to true when understanding is sufficient (70%+ score with no critical gaps).
-
-Keep feedback conversational, encouraging, and specific to their answer.`;
+Set "readyToProgress" to true when understanding is sufficient (70%+ score with no critical gaps).`;
 
     const userPrompt = `Question: ${question}\nContext: ${context || ''}\nAnswer: ${answer}\n\nAnalyze this answer to identify knowledge gaps. Respond with ONLY valid JSON in the required format.`;
 

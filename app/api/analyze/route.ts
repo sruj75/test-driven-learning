@@ -27,7 +27,7 @@ export async function POST(request: Request) {
       messages: [
         {
           role: 'system',
-          content: 'Provide a JSON array of knowledge gap strings based on the following Q&A. No additional explanation.'
+          content: 'ALWAYS use simple English as if teaching a 10-year-old child. Use short words, short sentences, and explain all concepts in the simplest possible way. Avoid technical jargon unless absolutely necessary. Provide a JSON array of knowledge gap strings based on the following Q&A. No additional explanation.'
         },
         {
           role: 'user',

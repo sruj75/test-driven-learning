@@ -3,7 +3,7 @@ import client, { MODEL_NAME } from '../../services/openaiClient';
 
 export async function POST(request: Request) {
   try {
-    const { gaps } = await request.json() as { gaps: string[] };
+    const { gaps, context } = await request.json() as { gaps: string[]; context?: string };
     
     if (!gaps || !Array.isArray(gaps)) {
       return NextResponse.json(
@@ -20,29 +20,29 @@ export async function POST(request: Request) {
         messages: [
           {
             role: "system",
-            content: "You are a concise educational AI that creates focused learning resources using bullet points and minimal text. Format content for quick consumption, similar to effective marketing copy. Prioritize clarity and directness over comprehensive explanations."
+            content: "ALWAYS use simple English as if teaching a 10-year-old child. Use short words, short sentences, and explain all concepts in the simplest possible way. Avoid technical jargon unless absolutely necessary, and when you must use it, define it immediately in plain language a child would understand. You are a concise educational AI that creates focused learning resources using bullet points and minimal text. Format content for quick consumption, similar to effective marketing copy. Prioritize clarity and directness over comprehensive explanations."
           },
           {
             role: "user",
             content: `Create a quick-scan learning resource for the concept "${gap}" that a user can consume in under 60 seconds.
-            
-            Follow these STRICT formatting rules:
-            1. Start with 2-3 bullet points of key facts/definitions (1 sentence each)
-            2. Include 1 very brief code example or demonstration (if applicable)
-            3. Add 2-3 bullet points with practical applications or tips
-            4. End with 1-2 common misconceptions as bullet points
+${context ? `Context: ${context}
+` : ''}Follow these STRICT formatting rules:
+  1. Start with 2-3 bullet points of key facts/definitions (1 sentence each)
+  2. Include 1 very brief code example or demonstration (if applicable)
+  3. Add 2-3 bullet points with practical applications or tips
+  4. End with 1-2 common misconceptions as bullet points
 
-            Use this structure:
-            * Key point 1
-            * Key point 2
-            
-            Example:
-            [brief example or code snippet]
-            
-            * Practical tip 1
-            * Practical tip 2
-            
-            * Common mistake: [misconception]`
+  Use this structure:
+  * Key point 1
+  * Key point 2
+
+  Example:
+  [brief example or code snippet]
+
+  * Practical tip 1
+  * Practical tip 2
+
+  * Common mistake: [misconception]`
           }
         ],
         temperature: 0.5,

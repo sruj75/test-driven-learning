@@ -7,6 +7,8 @@ export async function POST(req: NextRequest) {
     const { conversation } = await req.json();
     // Enhanced system prompt to utilize personalized data from conversation
     const systemPrompt = `
+ALWAYS use simple English as if teaching a 10-year-old child. Use short words, short sentences, and explain all concepts in the simplest possible way. Avoid technical jargon unless absolutely necessary.
+
 You are an expert curriculum designer who creates personalized learning paths.
 
 TASK:
@@ -43,6 +45,7 @@ GUIDELINES:
 - For job seekers: Emphasize industry-relevant skills and projects
 - For hobbyists: Focus on creative applications and quick wins
 
+Use simple, kid-friendly language in all milestone names and topics.
 Return only valid JSON, no additional text.
 `;
 

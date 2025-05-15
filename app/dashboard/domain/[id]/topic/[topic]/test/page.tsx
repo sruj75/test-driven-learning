@@ -96,7 +96,7 @@ export default function TopicTestPage() {
       setShowingResourceSuggestions(false);
       setSuggestedResources([]);
       
-      generateTest(topic, [topic])
+      generateTest(topic, [topic], roadmapContext)
         .then(newQuestions => {
           if (!newQuestions || newQuestions.length === 0) {
             setError('No test questions could be generated. Please try again.');
@@ -120,6 +120,9 @@ export default function TopicTestPage() {
     }
   }, [roadmap, milestoneIndex, topicIndex, mounted]);
 
+  // Build a full roadmap context string for AI calls
+  const roadmapContext = roadmap ? `Roadmap Overview:\n${roadmap.milestones.map((m, idx) => `${idx+1}. ${m.name} (${m.topics.length} topics: ${m.topics.join(', ')})`).join('\n')}\nCurrent Milestone: ${milestoneIndex + 1} - ${roadmap.milestones[milestoneIndex].name}\nCurrent Topic: ${topicIndex + 1} - ${roadmap.milestones[milestoneIndex].topics[topicIndex]}` : '';
+
   const handleAnswerChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const newAnswers = [...answers];
     newAnswers[currentQuestion] = e.target.value;
@@ -131,12 +134,12 @@ export default function TopicTestPage() {
     
     setIsSubmitting(true);
     try {
-      const question = questions[currentQuestion];
-      const answer = answers[currentQuestion];
-      const context = roadmap?.milestones[milestoneIndex]?.topics[topicIndex] || '';
+      const questionObj = questions[currentQuestion];
+      const answerText = answers[currentQuestion];
+      const context = roadmapContext;
       
       // Use the new assessment service
-      const result = await measureUnderstanding(question.question, answer, context);
+      const result = await measureUnderstanding(questionObj.question, answerText, context);
       setAssessmentResult(result);
       
       // Update understanding scores
@@ -186,13 +189,12 @@ export default function TopicTestPage() {
     
     setResourcesLoading(true);
     try {
-      const resources = await generateResources(identifiedGaps);
+      const resources = await generateResources(identifiedGaps, roadmapContext);
       setSuggestedResources(resources);
       setShowingResourceSuggestions(true);
     } catch (error) {
       console.error("Error generating resources:", error);
       setError("Failed to generate resources for your knowledge gaps. Please try again.");
-      // Reset loading state but keep showing resource suggestions UI
       setShowingResourceSuggestions(true);
     } finally {
       setResourcesLoading(false);
@@ -314,7 +316,7 @@ export default function TopicTestPage() {
         </div>
 
         <div className="mb-6 p-4 bg-yellow-50 border-l-4 border-yellow-500 rounded-lg">
-          <h2 className="text-lg font-medium text-yellow-800 mb-2">Focus Areas:</h2>
+          <h2 className="text-lg font-medium text-yellow-800 mb-2">What to learn next:</h2>
           <ul className="list-disc pl-5 space-y-1">
             {identifiedGaps.map((gap, index) => (
               <li key={index} className="text-gray-700 font-medium">{gap}</li>
@@ -352,8 +354,8 @@ export default function TopicTestPage() {
                         );
                       }
                       
-                      // If paragraph contains code or example, display as code
-                      if (paragraph.includes('```') || paragraph.includes('example:') || paragraph.includes('Example:')) {
+                      // If paragraph contains a code fence, display as code
+                      if (paragraph.includes('```')) {
                         return (
                           <div key={`code-${i}`} className="bg-gray-50 p-3 rounded border border-gray-200 font-mono text-sm overflow-x-auto">
                             {paragraph.replace(/```\w*\n?|```/g, '')}
@@ -370,29 +372,6 @@ export default function TopicTestPage() {
                       );
                     })}
                   </div>
-                  
-                  {resource.videos && resource.videos.length > 0 && (
-                    <div className="mt-3 pt-3 border-t border-gray-200">
-                      <p className="font-medium text-sm text-gray-600 mb-2">Quick Reference:</p>
-                      <div className="grid grid-cols-1 gap-2">
-                        {resource.videos.map((video, vIndex) => (
-                          <a 
-                            key={vIndex}
-                            href={video.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex items-center p-2 bg-blue-50 text-blue-700 rounded hover:bg-blue-100"
-                          >
-                            <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                              <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
-                              <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" />
-                            </svg>
-                            {video.title}
-                          </a>
-                        ))}
-                      </div>
-                    </div>
-                  )}
                 </div>
               ))
             ) : (
@@ -412,27 +391,32 @@ export default function TopicTestPage() {
           </button>
           <button
             onClick={() => {
-              // Check if we have answered all questions before trying to assess mastery
-              const answeredCount = answers.filter(Boolean).length;
-              
-              if (answeredCount === questions.length) {
-                // Only try to assess mastery if all questions are answered
-                if (assessTopicMastery()) {
-                  handleNavigateToNextTopic();
-                } else {
+              // If mastered, move to next topic
+              if (assessTopicMastery()) {
+                handleNavigateToNextTopic();
+                return;
+              }
+              // Otherwise, regenerate questions based on knowledge gaps
+              setShowingResourceSuggestions(false);
+              setIsLoading(true);
+              setError(null);
+              generateTest(
+                topicName,
+                identifiedGaps.length > 0 ? identifiedGaps : [topicName],
+                roadmapContext
+              )
+                .then(newQuestions => {
+                  setQuestions(newQuestions);
+                  setAnswers(new Array(newQuestions.length).fill(''));
+                  setUnderstandingScores(new Array(newQuestions.length).fill(0));
                   setCurrentQuestion(0);
                   setAssessmentResult(null);
-                  setShowingResourceSuggestions(false);
-                }
-              } else {
-                // If not all questions are answered, just go back to the test
-                setShowingResourceSuggestions(false);
-                // Focus on the first unanswered question
-                const firstUnansweredIndex = answers.findIndex(a => !a || !a.trim());
-                if (firstUnansweredIndex >= 0) {
-                  setCurrentQuestion(firstUnansweredIndex);
-                }
-              }
+                })
+                .catch(err => {
+                  console.error('Error loading follow-up questions:', err);
+                  setError('Failed to load new questions.');
+                })
+                .finally(() => setIsLoading(false));
             }}
             className="px-4 py-2 bg-blue-500 rounded-lg shadow-sm text-white hover:bg-blue-600 focus:outline-none"
           >

@@ -38,6 +38,57 @@ export interface KnowledgeAssessment {
 }
 
 /**
+ * Parameters to build a full session context for AI calls
+ */
+export interface SessionContextParams {
+  roadmap: Roadmap;
+  milestoneIndex: number;
+  topicIndex: number;
+  questionHistory: Question[];
+  resourceHistory: Task[];
+  identifiedGaps: string[];
+}
+
+/**
+ * Builds a single string summarizing the entire learning session state.
+ */
+export function buildSessionContext(params: SessionContextParams): string {
+  const { roadmap, milestoneIndex, topicIndex, questionHistory, resourceHistory, identifiedGaps } = params;
+  const lines: string[] = [];
+
+  lines.push('## Roadmap Overview');
+  roadmap.milestones.forEach((m, idx) => {
+    lines.push(`${idx + 1}. ${m.name} — topics: ${m.topics.join(', ')}`);
+  });
+
+  lines.push(`\n**Current Milestone**: ${milestoneIndex + 1}. ${roadmap.milestones[milestoneIndex].name}`);
+  lines.push(`**Current Topic**: ${topicIndex + 1}. ${roadmap.milestones[milestoneIndex].topics[topicIndex]}`);
+
+  if (questionHistory.length) {
+    lines.push('\n## Questions Asked');
+    questionHistory.forEach((q, i) => {
+      lines.push(`${i + 1}. ${q.question}`);
+    });
+  }
+
+  if (resourceHistory.length) {
+    lines.push('\n## Resources Provided');
+    resourceHistory.forEach((r, i) => {
+      lines.push(`${i + 1}. ${r.topic}`);
+    });
+  }
+
+  if (identifiedGaps.length) {
+    lines.push(`\n## Identified Gaps`);
+    identifiedGaps.forEach(gap => {
+      lines.push(`- ${gap}`);
+    });
+  }
+
+  return lines.join('\n');
+}
+
+/**
  * Generates a roadmap based on a conversation history
  */
 export async function generateRoadmap(conversation: string[]): Promise<Roadmap> {
@@ -54,13 +105,15 @@ export async function generateRoadmap(conversation: string[]): Promise<Roadmap> 
 }
 
 /**
- * Generates test questions based on a topic and concepts
+ * Generates test questions based on a topic, concepts, and optional context
  */
-export async function generateTest(topic: string, concepts: string[]): Promise<Question[]> {
+export async function generateTest(topic: string, concepts: string[], context?: string): Promise<Question[]> {
+  const payload: { topic: string; concepts: string[]; context?: string } = { topic, concepts };
+  if (context) payload.context = context;
   const response = await fetch('/api/test', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ topic, concepts }),
+    body: JSON.stringify(payload),
   });
   if (!response.ok) {
     const errorBody = await response.json().catch(() => ({}));
@@ -89,14 +142,17 @@ export async function analyzeGaps(questions: Question[], answers: Record<string,
 }
 
 /**
- * Generates learning resources for identified knowledge gaps
+ * Generates learning resources for identified knowledge gaps, in the context of a specific topic
  */
-export async function generateResources(gaps: string[]): Promise<Task[]> {
+export async function generateResources(gaps: string[], context?: string): Promise<Task[]> {
+  const payload: { gaps: string[]; context?: string } = { gaps };
+  if (context) payload.context = context;
   const response = await fetch('/api/resources', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ gaps }),
+    body: JSON.stringify(payload),
   });
+  
   if (!response.ok) {
     const errorBody = await response.json().catch(() => ({}));
     throw new Error(errorBody.error || `Resources API error: ${response.status}`);

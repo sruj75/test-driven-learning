@@ -21,7 +21,6 @@ export default function TopicResourcesPage() {
     setCurrentTopicIndex,
     tasks,
     setTasks,
-    markTaskCompleted,
   } = useRoadmap();
 
   // Hydration guard: mark mounted
@@ -136,8 +135,8 @@ export default function TopicResourcesPage() {
   
   const milestone = roadmap.milestones[milestoneIndex];
   const topicName = milestone.topics[topicIndex];
-  const allCompleted = tasks.every(task => task.completed);
-  
+  // All resources show means enable proceed
+
   const handleProceedToTest = () => {
     // Navigate to test page for current topic
     router.push(`/dashboard/domain/${milestoneIndex + 1}/topic/${topicIndex + 1}/test`);
@@ -166,19 +165,7 @@ export default function TopicResourcesPage() {
               <div className="prose max-w-none mb-4">
                 <ReactMarkdown>{task.explanation}</ReactMarkdown>
               </div>
-              <div className="flex justify-end">
-                <button
-                  onClick={() => markTaskCompleted(idx)}
-                  disabled={task.completed}
-                  className={`px-4 py-2 rounded ${
-                    task.completed
-                      ? 'bg-green-200 text-green-800 cursor-not-allowed'
-                      : 'bg-blue-500 text-white hover:bg-blue-600'
-                  }`}
-                >
-                  {task.completed ? 'Completed' : 'Mark as Complete'}
-                </button>
-              </div>
+              {/* Completion toggle removed to streamline flow */}
             </div>
           ))
         )}
@@ -187,9 +174,9 @@ export default function TopicResourcesPage() {
       <div className="mt-8 flex justify-end">
         <button
           onClick={handleProceedToTest}
-          disabled={!allCompleted || tasks.length === 0}
+          disabled={tasks.length === 0}
           className={`px-6 py-2 rounded ${
-            !allCompleted || tasks.length === 0
+            tasks.length === 0
               ? 'bg-gray-300 text-gray-600 cursor-not-allowed'
               : 'bg-green-500 text-white hover:bg-green-600'
           }`}
